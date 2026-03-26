@@ -7,46 +7,65 @@ import (
 	"strings"
 )
 
-
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("Usage: go run . sample.txt result.txt")
 		return
 	}
 	inputFile := os.Args[1]
-	// outputFile := os.Args[2]
+	outputFile := os.Args[2]
+
 	fileContent, err := os.ReadFile(inputFile)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println("Error reading input file:", err)
+		return
 	}
+
 	converted := (string(fileContent))
 	fileWords := strings.Fields(converted)
 	fileWords = handleTags(fileWords)
-	fmt.Println(fileWords)
 
+	outputString := strings.Join(fileWords, " ")
+	err = os.WriteFile(outputFile, []byte(outputString), 0644)
+	if err != nil {
+		fmt.Println("Error writing to output file:", err)
+	}
 }
 
 func handleTags(fileWords []string) []string {
-	for index, word:= range fileWords {
-		switch word {
+	for i := 0; i < len(fileWords); i++ {
+		switch fileWords[i] {
 		case "(hex)":
-			// convert the previous word from hex to decimal and replace it in the slice
-			hexValue := fileWords[index-1]
-			convertedValue, err := strconv.ParseInt(hexValue, 16, 64)
-			if err != nil {
-				fmt.Printf("Error decoding hex value: %v\n", err)
-				continue
+			if i > 0 {
+				// convert the previous word from hex to decimal
+				val, err := strconv.ParseInt(fileWords[i-1], 16, 64)
+				if err == nil {
+					fileWords[i-1] = strconv.FormatInt(val, 10)
+				}
+				// remove the (hex) tag
+				fileWords = append(fileWords[:i], fileWords[i+1:]...)
+				i-- // adjust index after removal
 			}
-			decimalValue := strconv.Itoa(int(convertedValue))
-			fileWords[index-1] = decimalValue
-			// remove the (hex) tag
-			fileWords = append(fileWords[:index], fileWords[index+1:]...)
-		}
+		case "(bin)":
+			if i > 0 {
+				// convert the previous word from binary to decimal
+				val, err := strconv.ParseInt(fileWords[i-1], 2, 64)
+				if err == nil {
+					fileWords[i-1] = strconv.FormatInt(val, 10)
+				}
+				// remove the (bin) tag
+				fileWords = append(fileWords[:i], fileWords[i+1:]...)
+				i--
+			}
 		case "(up)":
-			// Convert the previous word to Uppercase
-			InputFileWords[i-1] = strings.ToUpper(InputFileWords[i-1])
-			InputFileWords = append(InputFileWords[:i], InputFileWords[i+1:]...)
-			i--
+			if i > 0 {
+				// Convert the previous word to Uppercase
+				fileWords[i-1] = strings.ToUpper(fileWords[i-1])
+				// remove the (up) tag
+				fileWords = append(fileWords[:i], fileWords[i+1:]...)
+				i--
+			}
+		}
 	}
 	return fileWords
 }
