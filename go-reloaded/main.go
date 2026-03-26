@@ -42,6 +42,11 @@ func handleTags(fileWords []string) []string {
 			// remove the (hex) tag
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
 		}
+		case "(up)":
+			// Convert the previous word to Uppercase
+			InputFileWords[i-1] = strings.ToUpper(InputFileWords[i-1])
+			InputFileWords = append(InputFileWords[:i], InputFileWords[i+1:]...)
+			i--
 	}
 	return fileWords
 }
