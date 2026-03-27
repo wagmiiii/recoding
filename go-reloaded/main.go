@@ -12,8 +12,9 @@ func main() {
 		fmt.Println("Usage: go run . sample.txt result.txt")
 		return
 	}
+
 	inputFile := os.Args[1]
-	outputFile := os.Args[2]
+	// outputFile := os.Args[2]
 
 	fileContent, err := os.ReadFile(inputFile)
 	if err != nil {
@@ -23,49 +24,48 @@ func main() {
 
 	converted := (string(fileContent))
 	fileWords := strings.Fields(converted)
+
 	fileWords = handleTags(fileWords)
 
-	outputString := strings.Join(fileWords, " ")
-	err = os.WriteFile(outputFile, []byte(outputString), 0644)
-	if err != nil {
-		fmt.Println("Error writing to output file:", err)
-	}
+	fmt.Println(fileWords)
 }
 
 func handleTags(fileWords []string) []string {
-	for i := 0; i < len(fileWords); i++ {
-		switch fileWords[i] {
+	for index, word := range fileWords {
+		switch word {
+
 		case "(hex)":
-			if i > 0 {
-				// convert the previous word from hex to decimal
-				val, err := strconv.ParseInt(fileWords[i-1], 16, 64)
-				if err == nil {
-					fileWords[i-1] = strconv.FormatInt(val, 10)
-				}
-				// remove the (hex) tag
-				fileWords = append(fileWords[:i], fileWords[i+1:]...)
-				i-- // adjust index after removal
+			// convert the previous word from hex to decimal and replace it in the slice
+			hexValue := fileWords[index-1]
+
+			convertedValue, err := strconv.ParseInt(hexValue, 16, 64)
+			if err != nil {
+				fmt.Printf("Error decoding hex value: %v\n", err)
+				continue
 			}
+
+			decimalValue := strconv.Itoa(int(convertedValue))
+			fileWords[index-1] = decimalValue
+
+			// remove the (hex) tag
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+
 		case "(bin)":
-			if i > 0 {
-				// convert the previous word from binary to decimal
-				val, err := strconv.ParseInt(fileWords[i-1], 2, 64)
-				if err == nil {
-					fileWords[i-1] = strconv.FormatInt(val, 10)
-				}
-				// remove the (bin) tag
-				fileWords = append(fileWords[:i], fileWords[i+1:]...)
-				i--
+			//convert the previous word from bin to decimal
+			binValue := fileWords[index-1]
+
+			convertedValue, err := strconv.ParseInt(binValue, 2, 64)
+			if err != nil {
+				fmt.Println("Error decoding bin value ", err)
+				continue
 			}
-		case "(up)":
-			if i > 0 {
-				// Convert the previous word to Uppercase
-				fileWords[i-1] = strings.ToUpper(fileWords[i-1])
-				// remove the (up) tag
-				fileWords = append(fileWords[:i], fileWords[i+1:]...)
-				i--
-			}
+
+			decimalValue := strconv.Itoa(int(convertedValue))
+			fileWords[index-1] = decimalValue
+
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
 		}
 	}
+
 	return fileWords
 }
