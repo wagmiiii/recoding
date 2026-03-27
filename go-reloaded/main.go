@@ -5,6 +5,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/text/cases"
 )
 
 func main() {
@@ -64,7 +66,14 @@ func handleTags(fileWords []string) []string {
 			fileWords[index-1] = decimalValue
 
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+		case "(up)" :
+			fileWords[index-1] = strings.ToUpper(fileWords[index-1])
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+		case "(low)" :
+			fileWords[index-1] = strings.ToLower(fileWords[index-1])
+			fileWords = append(fileWords[:index], fileWords[index+1:]...) 
 		}
+		
 	}
 
 	return fileWords
