@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -33,13 +34,12 @@ func main() {
 func handleTags(fileWords []string) []string {
 	for index := 0; index < len(fileWords); index++ {
 		word := fileWords[index]
+		if index == 0 && (word == "(hex)" || word == "(bin)" || word == "(up)" || word == "(low)" || word == "(cap)") {
+			log.Fatal("\nError: tag cannot be the first word in the file.")
+		}
 		switch word {
 
 		case "(hex)":
-			if index == 0 {
-				fmt.Println("Error: (hex) tag cannot be the first word in the file.")
-				return nil
-			}
 			// convert the previous word from hex to decimal and replace it in the slice
 			hexValue := fileWords[index-1]
 
@@ -57,10 +57,6 @@ func handleTags(fileWords []string) []string {
 			index-- // Adjust index after removing the tag
 
 		case "(bin)":
-			if index == 0 {
-				fmt.Println("Error: (bin) tag cannot be the first word in the file.")
-				continue
-			}
 			//convert the previous word from bin to decimal
 			binValue := fileWords[index-1]
 
@@ -77,27 +73,29 @@ func handleTags(fileWords []string) []string {
 			index-- // Adjust index after removing the tag
 			
 		case "(up)" :
-			if index == 0 {
-				fmt.Println("Error: (up) tag cannot be the first word in the file.")
-				continue
-			}
-
 			fileWords[index-1] = strings.ToUpper(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
 			index-- // Adjust index after removing the tag
 
 		case "(low)" :
-			if index == 0 {
-				fmt.Println("Error: (low) tag cannot be the first word in the file.")
-				continue
-			}
-
 			fileWords[index-1] = strings.ToLower(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...) 
+			index-- // Adjust index after removing the tag
+
+		case "(cap)" :
+			fileWords[index-1] = capFirstLetter(fileWords[index-1])
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
 			index-- // Adjust index after removing the tag
 		}
 		
 	}
 
 	return fileWords
+}
+
+func capFirstLetter(word string) string {
+	word = strings.ToLower(word) // handle words with all caps by first turning to lowercase
+	firstLetter := strings.ToUpper(string(word[0])) // /
+	restLetters := word[1:]
+	return firstLetter + restLetters
 }
