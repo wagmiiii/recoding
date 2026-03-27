@@ -18,7 +18,8 @@ func main() {
 
 	fileContent, err := os.ReadFile(inputFile)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println("Error reading input file:", err)
+		return
 	}
 
 	converted := (string(fileContent))
