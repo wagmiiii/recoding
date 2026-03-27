@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -31,7 +32,11 @@ func main() {
 }
 
 func handleTags(fileWords []string) []string {
-	for index, word := range fileWords {
+	for index := 0; index < len(fileWords); index++ {
+		word := fileWords[index]
+		if index == 0 && (word == "(hex)" || word == "(bin)" || word == "(up)" || word == "(low)" || word == "(cap)") {
+			log.Fatal("\nError: tag cannot be the first word in the file.")
+		}
 		switch word {
 
 		case "(hex)":
@@ -49,6 +54,7 @@ func handleTags(fileWords []string) []string {
 
 			// remove the (hex) tag
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
 
 		case "(bin)":
 			//convert the previous word from bin to decimal
@@ -64,15 +70,32 @@ func handleTags(fileWords []string) []string {
 			fileWords[index-1] = decimalValue
 
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
+			
 		case "(up)" :
 			fileWords[index-1] = strings.ToUpper(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
+
 		case "(low)" :
 			fileWords[index-1] = strings.ToLower(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...) 
+			index-- // Adjust index after removing the tag
+
+		case "(cap)" :
+			fileWords[index-1] = capFirstLetter(fileWords[index-1])
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
 		}
 		
 	}
 
 	return fileWords
+}
+
+func capFirstLetter(word string) string {
+	word = strings.ToLower(word) // handle words with all caps by first turning to lowercase
+	firstLetter := strings.ToUpper(string(word[0])) // /
+	restLetters := word[1:]
+	return firstLetter + restLetters
 }
