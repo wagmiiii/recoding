@@ -31,10 +31,15 @@ func main() {
 }
 
 func handleTags(fileWords []string) []string {
-	for index, word := range fileWords {
+	for index := 0; index < len(fileWords); index++ {
+		word := fileWords[index]
 		switch word {
 
 		case "(hex)":
+			if index == 0 {
+				fmt.Println("Error: (hex) tag cannot be the first word in the file.")
+				return nil
+			}
 			// convert the previous word from hex to decimal and replace it in the slice
 			hexValue := fileWords[index-1]
 
@@ -49,8 +54,13 @@ func handleTags(fileWords []string) []string {
 
 			// remove the (hex) tag
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
 
 		case "(bin)":
+			if index == 0 {
+				fmt.Println("Error: (bin) tag cannot be the first word in the file.")
+				continue
+			}
 			//convert the previous word from bin to decimal
 			binValue := fileWords[index-1]
 
@@ -64,12 +74,27 @@ func handleTags(fileWords []string) []string {
 			fileWords[index-1] = decimalValue
 
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
+			
 		case "(up)" :
+			if index == 0 {
+				fmt.Println("Error: (up) tag cannot be the first word in the file.")
+				continue
+			}
+
 			fileWords[index-1] = strings.ToUpper(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
+			index-- // Adjust index after removing the tag
+
 		case "(low)" :
+			if index == 0 {
+				fmt.Println("Error: (low) tag cannot be the first word in the file.")
+				continue
+			}
+
 			fileWords[index-1] = strings.ToLower(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...) 
+			index-- // Adjust index after removing the tag
 		}
 		
 	}
