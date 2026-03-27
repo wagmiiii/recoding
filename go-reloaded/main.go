@@ -5,8 +5,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
-	"golang.org/x/text/cases"
 )
 
 func main() {
