@@ -31,7 +31,8 @@ func main() {
 }
 
 func handleTags(fileWords []string) []string {
-	for index, word := range fileWords {
+	for index := 0; index < len(fileWords); index++ {
+		word := fileWords[index]
 		switch word {
 
 		case "(hex)":
@@ -64,14 +65,14 @@ func handleTags(fileWords []string) []string {
 			fileWords[index-1] = decimalValue
 
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
-		case "(up)" :
+		case "(up)":
 			fileWords[index-1] = strings.ToUpper(fileWords[index-1])
 			fileWords = append(fileWords[:index], fileWords[index+1:]...)
-		case "(low)" :
+		case "(low)":
 			fileWords[index-1] = strings.ToLower(fileWords[index-1])
-			fileWords = append(fileWords[:index], fileWords[index+1:]...) 
+			fileWords = append(fileWords[:index], fileWords[index+1:]...)
 		}
-		
+
 	}
 
 	return fileWords
